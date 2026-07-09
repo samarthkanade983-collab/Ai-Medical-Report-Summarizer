@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - AI Medical Analyst</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auth-container {
+            max-width: 450px;
+            margin: 6rem auto;
+            position: relative;
+        }
+        .auth-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--card-border);
+            padding: 3rem; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-premium);
+            text-align: center;
+        }
+        .auth-title { margin-bottom: 2rem; }
+        .auth-title h2 { font-size: 2rem; font-weight: 800; color: var(--text-main); }
+        .auth-title p { color: var(--text-muted); font-size: 0.95rem; }
+        .flash-message { background: var(--danger-bg); color: var(--danger); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; font-weight: 600; font-size: 0.9rem; }
+        .auth-input { width: 100%; padding: 1.25rem; margin-bottom: 1.5rem; border: 2px solid rgba(148, 163, 184, 0.2); border-radius: var(--radius-md); background: rgba(255,255,255,0.4); color: var(--text-main); font-family: inherit; font-size: 1.05rem; transition: var(--transition); }
+        .auth-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px var(--primary-glow); background: var(--card-bg); }
+        .auth-btn { width: 100%; padding: 1.25rem; background: linear-gradient(135deg, var(--secondary), var(--info)); color: white; border: none; border-radius: var(--radius-md); font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5); }
+        .auth-link { margin-top: 1.5rem; display: block; color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 0.95rem; }
+        .auth-link span { color: var(--secondary); font-weight: 700; }
+        .auth-link:hover span { text-decoration: underline; }
+    </style>
+</head>
+<body class="light-mode">
+    <script src="/static/theme.js"></script>
+    <button type="button" id="theme-toggle" class="btn-icon auth-theme-btn" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="fa-solid fa-moon"></i></button>
+    <div class="auth-container fade-in">
+        <div class="auth-card">
+            <div class="logo justify-center mb-2" style="justify-content: center;">
+                <i class="fa-solid fa-notes-medical logo-icon" style="background: linear-gradient(135deg, var(--secondary), var(--info)); -webkit-background-clip: text;"></i>
+                <span>Register</span>
+            </div>
+            
+            <div class="auth-title">
+                <h2>Create Account</h2>
+                <p>Join to access powerful medical intelligence</p>
+            </div>
+            
+            {% with messages = get_flashed_messages() %}
+              {% for m in messages %}
+                <div class="flash-message">{{ m }}</div>
+              {% endfor %}
+            {% endwith %}
+
+            <form action="{{ url_for('signup') }}" method="POST">
+                <input type="text" name="username" class="auth-input" placeholder="Choose a Username" required autocomplete="username">
+                <input type="email" name="email" class="auth-input" placeholder="Email (optional)" autocomplete="email">
+                <input type="password" name="password" class="auth-input" placeholder="Create a Password" required autocomplete="new-password">
+                <button type="submit" class="auth-btn">Register <i class="fa-solid fa-user-plus ml-1"></i></button>
+            </form>
+            
+            <a href="{{ url_for('login') }}" class="auth-link">Already have an account? <span>Log in here</span></a>
+        </div>
+    </div>
+</body>
+</html>

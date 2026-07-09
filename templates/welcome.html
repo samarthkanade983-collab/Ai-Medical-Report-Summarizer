@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome — MedAI Health</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="light-mode genz-med">
+    <script src="/static/theme.js"></script>
+    <div class="genz-bg-grid" aria-hidden="true"></div>
+    <div class="genz-ecg genz-ecg--top" aria-hidden="true">
+        <svg viewBox="0 0 1200 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="genz-ecg-line" d="M0 20 H80 L95 8 L110 32 L125 12 L140 28 L160 20 H1240" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse logo-icon"></i>
+            <span>MedAI Health</span>
+        </div>
+        <div class="nav-links">
+            <span style="font-weight: 600; color: var(--primary);">Hi, {{ username }}</span>
+            <a href="/welcome" class="active"><i class="fa-solid fa-hand-sparkles"></i> Welcome</a>
+            <a href="/"><i class="fa-solid fa-microscope"></i> Analyze</a>
+            <a href="/consult" class="nav-chat-btn"><i class="fa-solid fa-user-doctor"></i> AI Consultant</a>
+            <a href="/history"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+            <a href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+            <button id="theme-toggle" type="button" class="btn-icon" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+        </div>
+    </nav>
+
+    <div class="container welcome-page">
+        <div class="welcome-visual-mosaic" aria-hidden="true">
+            <div class="welcome-mosaic-tile welcome-mosaic-tile--1 welcome-float welcome-float--1"><i class="fa-solid fa-stethoscope"></i></div>
+            <div class="welcome-mosaic-tile welcome-mosaic-tile--2 welcome-float welcome-float--2"><i class="fa-solid fa-microscope"></i></div>
+            <div class="welcome-mosaic-tile welcome-mosaic-tile--3 welcome-float welcome-float--3"><i class="fa-solid fa-heart-pulse"></i></div>
+        </div>
+
+        <div class="welcome-med-gallery" aria-hidden="true">
+            <figure class="welcome-med-fig welcome-med-fig--a welcome-float-slow">
+                <img src="/static/img/welcome-heartbeat.svg" alt="" width="400" height="220" loading="lazy">
+            </figure>
+            <figure class="welcome-med-fig welcome-med-fig--b welcome-float-slow" style="animation-delay: -2s;">
+                <img src="/static/img/welcome-lab.svg" alt="" width="400" height="220" loading="lazy">
+            </figure>
+            <figure class="welcome-med-fig welcome-med-fig--c welcome-float-slow" style="animation-delay: -4s;">
+                <img src="/static/img/welcome-shield.svg" alt="" width="400" height="220" loading="lazy">
+            </figure>
+        </div>
+
+        <div class="welcome-marquee" aria-hidden="true">
+            <div class="welcome-marquee-track">
+                <span>labs</span><span>·</span><span>vitals</span><span>·</span><span>prevention</span><span>·</span><span>AI insight</span><span>·</span><span>your care team</span><span>·</span>
+                <span>labs</span><span>·</span><span>vitals</span><span>·</span><span>prevention</span><span>·</span><span>AI insight</span><span>·</span><span>your care team</span><span>·</span>
+            </div>
+        </div>
+
+        <header class="welcome-hero">
+            <p class="welcome-eyebrow welcome-reveal">You’re in · health clarity starts here</p>
+            <h1 class="genz-title welcome-h1 welcome-reveal">Welcome, <span class="genz-gradient-text welcome-gradient-shift">{{ username }}</span></h1>
+            <p class="welcome-lead welcome-reveal welcome-reveal--delay">Explore <strong>trusted basics</strong> about labs, prevention, and smart habits — then use our analyzer and chat to go deeper with <strong>multi-model AI</strong> built for clarity.</p>
+            <div class="welcome-cta-row welcome-reveal welcome-reveal--delay2">
+                <a href="/" class="welcome-cta welcome-cta--primary"><i class="fa-solid fa-file-waveform"></i> Run a report analysis</a>
+                <a href="/consult" class="welcome-cta welcome-cta--chat"><i class="fa-solid fa-user-doctor"></i> Free AI medical consultant</a>
+            </div>
+        </header>
+
+        <section class="welcome-card-grid">
+            <article class="welcome-bento welcome-bento--accent">
+                <div class="welcome-bento-strip" aria-hidden="true"><i class="fa-solid fa-vial-circle-check"></i></div>
+                <h2>Understanding your labs</h2>
+                <p>Blood tests track markers like <strong>glucose</strong>, <strong>lipids</strong>, <strong>counts</strong>, and <strong>thyroid</strong> hormones. Results are compared to reference ranges — they are one part of a bigger picture that includes how you feel and how values change over time.</p>
+            </article>
+            <article class="welcome-bento">
+                <span class="welcome-icon">🛡️</span>
+                <h2>Prevention &amp; daily habits</h2>
+                <p>Guidelines worldwide highlight <strong>balanced nutrition</strong>, <strong>movement</strong>, <strong>sleep</strong>, <strong>stress balance</strong>, and <strong>avoiding smoking</strong>. Small steady upgrades compound. Screening and vaccines personalize with age and risk — your clinician helps tailor the plan.</p>
+            </article>
+            <article class="welcome-bento">
+                <span class="welcome-icon">🚨</span>
+                <h2>Urgent symptoms</h2>
+                <p>Seek emergency care for <strong>chest pain</strong>, <strong>severe shortness of breath</strong>, <strong>sudden weakness or confusion</strong>, <strong>major bleeding</strong>, or <strong>harm thoughts</strong>. For anything new or worrisome that is not emergent, scheduling a visit is a strong move — questions are always welcome.</p>
+            </article>
+            <article class="welcome-bento">
+                <span class="welcome-icon">🧠</span>
+                <h2>Partner with your care team</h2>
+                <p>Bring a list of <strong>medications and allergies</strong>. Ask what results mean <strong>for you</strong>. Pair what you learn here with your clinician’s exam and follow-up — that combination gives the fullest picture of your health journey.</p>
+            </article>
+        </section>
+
+        <section class="welcome-trust">
+            <div class="welcome-trust-inner">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <p><strong>Your hub for smarter health literacy.</strong> MedAI Health combines report tools, chat, and layered probabilistic models so you can walk into appointments informed, confident, and ready to collaborate.</p>
+            </div>
+        </section>
+    </div>
+
+    <a href="/consult" class="genz-fab-chat" title="Open free AI medical consultant" aria-label="Open free AI medical consultant"><i class="fa-solid fa-user-doctor"></i></a>
+
+    <script src="/static/script.js?v=test20"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Databases
+*.db
+*.sqlite3
+
+# Python caches
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+
+# Environment and IDE folders
+**/.qoder/
+**/.zencoder/
+**/.zenflow/
+**/.venv/
+**/venv/
+**/.env
+
+# Uploads or temporary files
+**/uploads/

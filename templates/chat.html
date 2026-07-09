@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free AI Medical Consultant — MedAI Health</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="light-mode genz-med">
+    <script src="/static/theme.js"></script>
+    <div class="genz-bg-grid" aria-hidden="true"></div>
+    <div class="genz-ecg genz-ecg--top" aria-hidden="true">
+        <svg viewBox="0 0 1200 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="genz-ecg-line" d="M0 20 H80 L95 8 L110 32 L125 12 L140 28 L160 20 H1240" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse logo-icon"></i>
+            <span>MedAI Health</span>
+        </div>
+        <div class="nav-links">
+            <span style="font-weight: 600; color: var(--primary);">{{ username }}</span>
+            <a href="/welcome"><i class="fa-solid fa-hand-sparkles"></i> Welcome</a>
+            <a href="/"><i class="fa-solid fa-microscope"></i> Analyze</a>
+            <a href="/consult" class="nav-chat-btn active"><i class="fa-solid fa-user-doctor"></i> AI Consultant</a>
+            <a href="/history"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+            <a href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+            <button id="theme-toggle" type="button" class="btn-icon" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+        </div>
+    </nav>
+
+    <div class="container chat-standalone-page">
+        <p class="chat-page-kicker"><i class="fa-solid fa-shield-heart"></i> Medical education only — not a diagnosis</p>
+        <h1 class="genz-title chat-page-title">Free <span class="genz-gradient-text">AI medical consultant</span></h1>
+        <p class="chat-page-sub">Ask general health questions or follow-ups about your <strong>last analysis</strong> (if you’ve run one). Context from Analyze carries over in this session. Always free — not a replacement for your clinician.</p>
+
+        <section class="genz-chat-section genz-chat-section--standalone" aria-label="Free AI medical consultant">
+            <div class="genz-chat-head">
+                <div class="genz-chat-head-text">
+                    <span class="genz-chat-kicker">🩺 free consultant · full-page chat</span>
+                    <h4 class="genz-chat-title"><i class="fa-solid fa-user-doctor"></i> Message your consultant</h4>
+                    <p class="genz-chat-disclaimer">Uses saved context from your last report run when available. For emergencies, use real emergency services — not this chat.</p>
+                </div>
+                <div class="genz-chat-head-art" aria-hidden="true">
+                    <svg viewBox="0 0 120 120" class="genz-pulse-svg" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="gRadialChat" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#7ee8c6"/>
+                                <stop offset="100%" stop-color="#c4b5fd"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="60" cy="60" r="52" fill="url(#gRadialChat)" opacity="0.35"/>
+                        <path d="M20 60 H40 L48 38 L56 78 L64 42 L72 70 L80 60 H100" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="genz-pulse-path"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div id="medical-chat-panel" class="genz-chat-panel">
+                <div id="chat-messages" class="genz-chat-messages"></div>
+
+                <div class="genz-chat-toolbar">
+                    <label class="genz-switch" title="Shorter words for new messages">
+                        <input type="checkbox" id="chat-simple-mode" name="chat-simple-mode">
+                        <span class="genz-switch-ui" aria-hidden="true"></span>
+                        <span class="genz-switch-label">Simple replies</span>
+                    </label>
+                    <button type="button" id="chat-simplify-last-btn" class="genz-btn-simplify" title="Easier English for last reply">
+                        <span class="genz-btn-simplify-icon">✂️</span> Simplify last reply
+                    </button>
+                </div>
+
+                <div class="genz-chat-input-row">
+                    <input type="text" id="chat-input" class="genz-chat-input" placeholder="Ask anything health-related… 🩺" autocomplete="off">
+                    <button type="button" id="chat-send-btn" class="genz-btn-send">
+                        <span>Send</span><i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+                <button type="button" id="chat-clear-btn" class="genz-btn-ghost">
+                    <i class="fa-solid fa-trash-can"></i> Clear thread
+                </button>
+            </div>
+        </section>
+
+        <p class="chat-page-foot"><a href="/"><i class="fa-solid fa-arrow-left"></i> Back to report analyzer</a></p>
+    </div>
+
+    <a href="/" class="genz-fab-chat genz-fab-chat--alt" title="Go to report analyzer" aria-label="Go to report analyzer"><i class="fa-solid fa-file-waveform"></i></a>
+
+    <script src="/static/script.js?v=test20"></script>
+</body>
+</html>

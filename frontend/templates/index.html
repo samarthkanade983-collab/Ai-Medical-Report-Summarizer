@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Report Summarizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🏥 Medical Report Summarizer</h1>
+                <p class="subtitle">AI-Powered Health Analysis & Summarization</p>
+            </div>
+            <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+                🌙
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Input Section -->
+            <section class="card input-section">
+                <h2>Enter Medical Report</h2>
+                
+                <!-- File Upload Area -->
+                <div class="upload-area">
+                    <input type="file" id="pdfUpload" accept=".pdf" style="display: none;">
+                    <button id="uploadPdfBtn" class="btn btn-upload">
+                        📄 Upload PDF Report
+                    </button>
+                    <p class="upload-hint">or paste text below</p>
+                    <div id="fileInfo" class="file-info" style="display: none;">
+                        <span id="fileName"></span>
+                        <button id="removeFileBtn" class="btn-remove-file">×</button>
+                    </div>
+                </div>
+                
+                <textarea 
+                    id="reportInput" 
+                    placeholder="Paste your medical report text here...
+
+Example:
+Patient blood glucose level is 180 mg/dL. 
+Hemoglobin count shows 11 g/dL. 
+Total cholesterol measured at 220 mg/dL.
+The patient reports frequent urination and excessive thirst."
+                ></textarea>
+                
+                <div class="button-group">
+                    <button id="analyzeBtn" class="btn btn-primary">
+                        <span class="btn-text">Analyze Report</span>
+                        <span class="loading-spinner" style="display: none;">Analyzing...</span>
+                    </button>
+                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                </div>
+            </section>
+
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="loading-overlay" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing your report...</p>
+            </div>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <!-- Summary Card -->
+                <div class="card result-card summary-card">
+                    <h3>📋 Summary</h3>
+                    <p id="summaryText" class="summary-text"></p>
+                </div>
+
+                <!-- Data Visualization Card -->
+                <div class="card result-card visualization-card">
+                    <h3>📊 Medical Values Visualization</h3>
+                    <div class="chart-container">
+                        <canvas id="medicalChart"></canvas>
+                    </div>
+                    <div id="noChartDataMessage" class="no-chart-message" style="display: none;">
+                        No medical values extracted to display
+                    </div>
+                </div>
+
+                <!-- Detected Issues Card -->
+                <div class="card result-card issues-card">
+                    <h3>⚠️ Detected Health Issues</h3>
+                    <ul id="issuesList" class="issues-list"></ul>
+                    <p id="noIssuesMessage" class="no-issues-message" style="display: none;">
+                        ✅ No health issues detected. Your report appears normal!
+                    </p>
+                </div>
+
+                <!-- Advice Card -->
+                <div class="card result-card advice-card">
+                    <h3>💡 Health Advice</h3>
+                    <p id="adviceText" class="advice-text"></p>
+                </div>
+
+                <!-- Explainable AI Card -->
+                <div class="card result-card explanation-card">
+                    <h3>🔍 Why This Result? (Explainable AI)</h3>
+                    <div id="explanationsContainer" class="explanations-container">
+                        <!-- Explanations will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Probabilistic Models Card (Naive Bayes & GaussianNB) -->
+                <div class="card result-card prob-card" style="border-left: 4px solid #9b59b6;">
+                    <h3>🎲 Probabilistic Analysis (Naive Bayes)</h3>
+                    
+                    <div class="prob-section">
+                        <h4>Predicted Hospital Department</h4>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span id="predDepartment" style="font-size: 1.2rem; font-weight: bold; color: #9b59b6;"></span>
+                            <span id="deptConfidence" class="stat-badge"></span>
+                        </div>
+                        <ul id="deptProbList" class="issues-list" style="list-style-type: none; padding-left: 0; margin-top: 5px;"></ul>
+                    </div>
+
+                    <div class="prob-section" style="margin-top: 20px;">
+                        <h4>Disease Risk Probability</h4>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span id="predRisk" style="font-size: 1.2rem; font-weight: bold; color: #e74c3c;"></span>
+                            <span id="riskProbabilityPercent" class="stat-badge"></span>
+                        </div>
+                        <ul id="riskProbList" class="issues-list" style="list-style-type: none; padding-left: 0; margin-top: 5px;"></ul>
+                    </div>
+                </div>
+
+                <!-- NLP Summary Card -->
+                <div class="card result-card nlp-card">
+                    <h3>🤖 NLP-Based Summary</h3>
+                    <p id="nlpSummaryText" class="nlp-summary"></p>
+                    <div class="nlp-stats">
+                        <span class="stat-badge">Compression: <strong id="compressionRatio">0%</strong></span>
+                        <span class="stat-badge">Processing: <strong id="nlpTime">0ms</strong></span>
+                    </div>
+                </div>
+
+                <!-- Comparison Table Card -->
+                <div class="card result-card comparison-card">
+                    <h3>⚖️ Method Comparison: Rule-Based vs NLP</h3>
+                    <div class="table-container">
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Rule-Based Analysis</th>
+                                    <th>NLP Summarization</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Method</strong></td>
+                                    <td id="ruleMethod">Rule-Based Analysis</td>
+                                    <td id="nlpMethod">NLP Summarization</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Accuracy</strong></td>
+                                    <td id="ruleAccuracy">High (for structured data)</td>
+                                    <td id="nlpAccuracy">Medium-High</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Speed</strong></td>
+                                    <td id="ruleSpeed">-</td>
+                                    <td id="nlpSpeed">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Complexity</strong></td>
+                                    <td id="ruleComplexity">Low</td>
+                                    <td id="nlpComplexity">Medium</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Strengths</strong></td>
+                                    <td id="ruleStrengths">
+                                        <ul class="strengths-list">
+                                            <li>Precise value extraction</li>
+                                            <li>Clear thresholds</li>
+                                            <li>Explainable</li>
+                                        </ul>
+                                    </td>
+                                    <td id="nlpStrengths">
+                                        <ul class="strengths-list">
+                                            <li>Handles free text</li>
+                                            <li>Extracts key points</li>
+                                            <li>Flexible</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Weaknesses</strong></td>
+                                    <td id="ruleWeaknesses">
+                                        <ul class="weaknesses-list">
+                                            <li>Requires specific format</li>
+                                            <li>Limited flexibility</li>
+                                        </ul>
+                                    </td>
+                                    <td id="nlpWeaknesses">
+                                        <ul class="weaknesses-list">
+                                            <li>May miss specific values</li>
+                                            <li>Context dependent</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Processing Info -->
+                <div class="processing-info">
+                    <p>Total processing time: <strong id="totalTime">0</strong>ms | 
+                       Original text length: <strong id="textLength">0</strong> characters</p>
+                </div>
+            </section>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message" style="display: none;">
+                <p id="errorText"></p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Medical Report Summarizer | Advanced AI Project | 2026</p>
+            <p class="disclaimer">⚠️ For educational purposes only. Not a substitute for professional medical advice.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

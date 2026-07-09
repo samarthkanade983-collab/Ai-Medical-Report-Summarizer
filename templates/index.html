@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Medical Analyst</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="light-mode genz-med">
+    <script src="/static/theme.js"></script>
+    <div class="genz-bg-grid" aria-hidden="true"></div>
+    <div class="genz-ecg genz-ecg--top" aria-hidden="true">
+        <svg viewBox="0 0 1200 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="genz-ecg-line" d="M0 20 H80 L95 8 L110 32 L125 12 L140 28 L160 20 H1240" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse logo-icon"></i>
+            <span>MedAI Health</span>
+        </div>
+        <div class="nav-links">
+            <span style="font-weight: 600; color: var(--primary);">{{ username }}</span>
+            <a href="/welcome"><i class="fa-solid fa-hand-sparkles"></i> Welcome</a>
+            <a href="/" class="active"><i class="fa-solid fa-microscope"></i> Analyze</a>
+            <a href="/consult" class="nav-chat-btn"><i class="fa-solid fa-user-doctor"></i> AI Consultant</a>
+            <a href="/history"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+            <a href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+            <button id="theme-toggle" type="button" class="btn-icon" aria-label="Toggle theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero-section genz-hero">
+            <div class="hero-visual-strip" aria-hidden="true">
+                <div class="hero-visual-tile hero-visual-tile--1"><i class="fa-solid fa-user-doctor"></i></div>
+                <div class="hero-visual-tile hero-visual-tile--2"><i class="fa-solid fa-flask-vial"></i></div>
+                <div class="hero-visual-tile hero-visual-tile--3"><i class="fa-solid fa-heart-pulse"></i></div>
+            </div>
+            <div class="genz-hero-visual" aria-hidden="true">
+                <span class="genz-float genz-float--1">🫀</span>
+                <span class="genz-float genz-float--2">🧬</span>
+                <span class="genz-float genz-float--3">💊</span>
+            </div>
+            <div class="badge-pill genz-badge mb-2"><i class="fa-solid fa-bolt"></i> scan · summarize · vibe-check your labs</div>
+            <h1 class="genz-title">Med report <span class="genz-gradient-text">decode</span> ✨</h1>
+            <p class="genz-hero-sub">Drop a PDF / pic or paste messy clinic text. Charts + AI + chat that actually speaks human (optional ELI5 mode).</p>
+        </div>
+
+        <section class="card interactive-card consultant-spotlight fade-in" aria-label="Free AI medical consultant">
+            <div class="consultant-spotlight-inner">
+                <div class="consultant-spotlight-art" aria-hidden="true"><i class="fa-solid fa-user-doctor"></i></div>
+                <div class="consultant-spotlight-copy">
+                    <span class="consultant-spotlight-badge">Free</span>
+                    <h2 class="consultant-spotlight-title">AI medical consultant</h2>
+                    <p class="consultant-spotlight-desc">General health Q&amp;A in plain language — uses your last analysis when you’ve run one. Not a substitute for in-person care.</p>
+                    <a href="/consult" class="btn-primary consultant-spotlight-cta"><i class="fa-solid fa-comments"></i> Open free consultant</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="card interactive-card">
+            <h3><i class="fa-solid fa-cloud-arrow-up text-primary"></i> Input Medical Data</h3>
+            <form id="analyze-form">
+                <div class="form-group">
+                    <label for="pdf-upload" class="upload-label">
+                        <i class="fa-regular fa-file-image"></i>
+                        <span>Click or Drag to Upload Report (PDF, JPG, PNG)</span>
+                        <input type="file" id="pdf-upload" accept="application/pdf, image/png, image/jpeg, image/jpg, image/webp">
+                    </label>
+                </div>
+                
+                <div class="divider"><span>OR PASTE TEXT</span></div>
+                
+                <div class="form-group">
+                    <textarea id="text-input" placeholder="E.g., Glucose 150 mg/dL. Hemoglobin 10.5 g/dL. Cholestrol 220 mg/dL. Heart Rate 85 bpm. Blood Pressure 120/80. WBC 6.7." rows="5"></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn-primary" id="analyze-btn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Process & Analyze Report
+                    </button>
+                    <button type="button" class="btn-secondary" id="clear-btn" onclick="document.getElementById('analyze-form').reset(); document.getElementById('results').classList.add('hidden');">
+                        <i class="fa-solid fa-eraser"></i> Clear Data
+                    </button>
+                </div>
+                <div id="error-msg" class="hidden text-danger mt-2" style="font-weight: 600; text-align: center;"></div>
+            </form>
+        </div>
+
+        <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p><strong>Analyzing health metrics...</strong><br><span style="font-size:0.9rem; color:#888;">Extracting patterns and generating NLP summaries...</span></p>
+        </div>
+
+        <div id="results" class="hidden">
+            <div class="result-grid">
+                <!-- Visual Graph Component -->
+                <div class="card fade-in">
+                    <h3><i class="fa-solid fa-chart-line text-primary"></i> Vitals Dashboard (Graph Summary)</h3>
+                    <p class="text-muted mb-2">Short graph summary of extracted patient metrics vs normal thresholds.</p>
+                    <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
+                        <canvas id="medical-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Analysis Details -->
+                <div class="card fade-in" style="animation-delay: 0.1s;">
+                    <h3><i class="fa-solid fa-clipboard-list text-primary"></i> Intelligence Report</h3>
+                    
+                    <!-- Dynamic Summaries -->
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="margin-top:0;"><i class="fa-solid fa-bolt text-warning"></i> Brief Summary</h4>
+                        <div class="explain-item" id="rule-summary" style="font-weight: 500;"></div>
+                        <h4 class="mt-2"><i class="fa-solid fa-brain text-secondary"></i> Clinical summary</h4>
+                        <div class="explain-item" id="nlp-summary" style="border-left-color: var(--secondary); white-space: pre-wrap;"></div>
+                        <div style="display:flex; gap:0.6rem; flex-wrap:wrap; margin-top:0.7rem;">
+                            <span id="wellness-score" class="badge none">Wellness score: --</span>
+                            <button type="button" id="copy-summary-btn" class="btn-secondary" style="padding:0.45rem 0.9rem; flex:0; font-size:0.88rem;">
+                                <i class="fa-solid fa-copy"></i> Copy summary
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2-col">
+                        <div class="card fade-in" style="animation-delay: 0.1s;">
+                            <h4><i class="fa-solid fa-triangle-exclamation text-danger"></i> Detected Issues</h4>
+                            <div id="issues-list" class="mt-2"></div>
+                        </div>
+                        
+                        <div class="card fade-in" style="animation-delay: 0.2s;">
+                            <h4><i class="fa-solid fa-virus text-warning"></i> Potential Diseases</h4>
+                            <div id="diseases-list" class="mt-2"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2-col">
+                        <div class="card fade-in" style="animation-delay: 0.3s;">
+                            <h4><i class="fa-solid fa-stethoscope text-primary"></i> Actionable Advice</h4>
+                            <div id="advice-list" class="mt-2"></div>
+                        </div>
+                        
+                        <div class="card fade-in" style="animation-delay: 0.4s;">
+                            <h4><i class="fa-solid fa-circle-question text-info"></i> Explainable AI Context</h4>
+                            <div id="explanations-list" class="mt-2"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card fade-in" style="animation-delay: 0.5s; background: rgba(155, 89, 182, 0.05); border-left: 4px solid #9b59b6; margin-top: 1rem;">
+                        <h4><i class="fa-solid fa-dice text-primary"></i> Probabilistic models (NB + RF + GMM + HMM)</h4>
+                        
+                        <div style="margin-top: 1rem;">
+                            <h5>Predicted Medical Department</h5>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem;">
+                                <span id="predDepartment" style="font-size: 1.2rem; font-weight: bold; color: #9b59b6;">-</span>
+                                <span id="deptConfidence" class="badge"></span>
+                            </div>
+                            <div id="deptProbList" class="mt-2 text-muted" style="font-size: 0.9rem;"></div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem; border-top: 1px dashed var(--card-border); padding-top: 1rem;">
+                            <h5>Ensemble disease risk (Naive Bayes + Random Forest)</h5>
+                            <p id="ensemble-detail-line" class="text-muted" style="font-size: 0.82rem; margin-bottom: 0.5rem;"></p>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem;">
+                                <span id="predRisk" style="font-size: 1.2rem; font-weight: bold; color: #e74c3c;">-</span>
+                                <span id="riskProbabilityPercent" class="badge bg-danger"></span>
+                            </div>
+                            <div id="riskProbList" class="mt-2 text-muted" style="font-size: 0.9rem;"></div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem; border-top: 1px dashed var(--card-border); padding-top: 1rem;">
+                            <h5>Random Forest (decision trees)</h5>
+                            <p id="rf-note" class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.5rem;"></p>
+                            <div id="rfProbList" class="mt-2 text-muted" style="font-size: 0.9rem;"></div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem; border-top: 1px dashed var(--card-border); padding-top: 1rem;">
+                            <h5>Hidden Markov model (lab sequence)</h5>
+                            <p id="hmm-block-note" class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.5rem;"></p>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                                <span id="hmmPrimaryRisk" style="font-size: 1.05rem; font-weight: bold; color: #16a085;">-</span>
+                            </div>
+                            <div id="hmmPathList" class="mt-2 text-muted" style="font-size: 0.9rem;"></div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem; border-top: 1px dashed var(--card-border); padding-top: 1rem;">
+                            <h5>Risk profile (Gaussian Mixture Model)</h5>
+                            <p id="gmm-note" class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.5rem;"></p>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                                <span id="gmmPrimary" style="font-size: 1.1rem; font-weight: bold; color: #8e44ad;">-</span>
+                                <span id="gmmConfidence" class="badge"></span>
+                            </div>
+                            <div id="gmmProbList" class="mt-2 text-muted" style="font-size: 0.9rem;"></div>
+                        </div>
+                    </div>
+
+                    <section class="genz-chat-section" aria-label="Free AI medical consultant">
+                        <div class="genz-chat-head">
+                            <div class="genz-chat-head-text">
+                                <span class="genz-chat-kicker">🩺 free consultant · context-aware</span>
+                                <h4 class="genz-chat-title"><i class="fa-solid fa-user-doctor"></i> Ask anything (about your report)</h4>
+                                <p class="genz-chat-disclaimer">Uses your latest run (models + values). Not your doctor — for real decisions, see a clinician.</p>
+                            </div>
+                            <div class="genz-chat-head-art" aria-hidden="true">
+                                <svg viewBox="0 0 120 120" class="genz-pulse-svg" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="gRadial" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#7ee8c6"/>
+                                            <stop offset="100%" stop-color="#c4b5fd"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <circle cx="60" cy="60" r="52" fill="url(#gRadial)" opacity="0.35"/>
+                                    <path d="M20 60 H40 L48 38 L56 78 L64 42 L72 70 L80 60 H100" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="genz-pulse-path"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div id="medical-chat-panel" class="genz-chat-panel">
+                            <div id="chat-messages" class="genz-chat-messages"></div>
+
+                            <div class="genz-chat-toolbar">
+                                <label class="genz-switch" title="Shorter words &amp; softer complexity for new messages">
+                                    <input type="checkbox" id="chat-simple-mode" name="chat-simple-mode">
+                                    <span class="genz-switch-ui" aria-hidden="true"></span>
+                                    <span class="genz-switch-label">Simple replies</span>
+                                </label>
+                                <button type="button" id="chat-simplify-last-btn" class="genz-btn-simplify" title="Rewrite the last bot message in easier English">
+                                    <span class="genz-btn-simplify-icon">✂️</span> Simplify last reply
+                                </button>
+                            </div>
+
+                            <div class="genz-chat-input-row">
+                                <input type="text" id="chat-input" class="genz-chat-input" placeholder="e.g. Is my WBC sketchy high? What should I even ask my doc? 🩺" autocomplete="off">
+                                <button type="button" id="chat-send-btn" class="genz-btn-send">
+                                    <span>Send</span><i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                            <button type="button" id="chat-clear-btn" class="genz-btn-ghost">
+                                <i class="fa-solid fa-trash-can"></i> Clear thread
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="/consult" class="genz-fab-chat" title="Open free AI medical consultant" aria-label="Open free AI medical consultant"><i class="fa-solid fa-user-doctor"></i></a>
+    
+    <script src="/static/script.js?v=test20"></script>
+</body>
+</html>

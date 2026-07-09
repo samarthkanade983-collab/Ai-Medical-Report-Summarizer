@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis History - AI Medical Analyst</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="light-mode">
+    <script src="/static/theme.js"></script>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse logo-icon"></i>
+            <span>MedAI Health</span>
+        </div>
+        <div class="nav-links">
+            <span style="font-weight: 600; color: var(--primary);">{{ username }}</span>
+            <a href="/welcome"><i class="fa-solid fa-hand-sparkles"></i> Welcome</a>
+            <a href="/"><i class="fa-solid fa-microscope"></i> Analyze</a>
+            <a href="/consult" class="nav-chat-btn"><i class="fa-solid fa-user-doctor"></i> AI Consultant</a>
+            <a href="/history" class="active"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+            <a href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+            <button type="button" id="theme-toggle" class="btn-icon" aria-label="Toggle theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="history-header">
+            <div>
+                <h2><i class="fa-solid fa-clock-rotate-left text-primary"></i> Analysis History</h2>
+                <p class="text-muted" style="margin-top: 5px;">View your full summarized NLP reports and health risks.</p>
+            </div>
+            <button id="clear-history-btn" class="btn-danger">
+                <i class="fa-solid fa-trash-can"></i> Clear All History
+            </button>
+        </div>
+        
+        <div id="history-container" class="history-list">
+            <div class="text-center" style="padding: 2rem;">
+                <div class="spinner"></div>
+                <p>Loading your full reports...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', fetchHistory);
+
+        async function fetchHistory() {
+            const container = document.getElementById('history-container');
+            try {
+                const res = await fetch('/api/history');
+                const data = await res.json();
+                
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="card text-center fade-in"><p>No analysis history found.</p></div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                data.forEach((item, index) => {
+                    const el = document.createElement('div');
+                    el.className = 'history-item fade-in';
+                    el.style.animationDelay = `${index * 0.1}s`;
+                    
+                    const dateObj = new Date(item.date_time + 'Z'); 
+                    const formattedDate = dateObj.toLocaleString();
+
+                    let badges = '';
+                    if (!item.issues || item.issues.length === 0) {
+                        badges = '<span class="badge none">No Risks Detected</span>';
+                    } else {
+                        item.issues.forEach(iss => {
+                            badges += `<span class="badge">${iss}</span>`;
+                        });
+                    }
+
+                    // For the accordion
+                    const accordionId = `acc-${item.id}`;
+
+                    el.innerHTML = `
+                        <div class="history-item-header">
+                            <span class="history-date"><i class="fa-regular fa-calendar text-primary"></i> ${formattedDate}</span>
+                            <button class="btn-icon btn-del text-danger" data-id="${item.id}" title="Delete Record">
+                                <i class="fa-solid fa-xmark"></i> Delete
+                            </button>
+                        </div>
+                        <div style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            ${badges}
+                        </div>
+                        <p style="margin-bottom: 0.5rem;"><strong>Brief:</strong> ${item.summary}</p>
+                        
+                        <div class="accordion-header" style="cursor: pointer; color: var(--primary); font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; border-top: 1px dashed var(--card-border); padding-top: 1rem;" onclick="document.getElementById('${accordionId}').classList.toggle('hidden')">
+                            <i class="fa-solid fa-caret-down"></i> View Original Text
+                        </div>
+                        
+                        <div id="${accordionId}" class="hidden accordion-body" style="background: rgba(0,0,0,0.02); padding: 1.5rem; border-radius: 12px; margin-top: 0.5rem; border-left: 3px solid var(--primary);">
+                            <h4 style="color: var(--text-main);"><i class="fa-regular fa-file-lines text-muted"></i> Original Extracted Text</h4>
+                            <p style="font-size: 0.9rem; color: #888; white-space: pre-wrap;">${item.text || 'No original text available.'}</p>
+                        </div>
+                    `;
+                    container.appendChild(el);
+                });
+
+                document.querySelectorAll('.btn-del').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        if (confirm('Permanently delete this medical record?')) {
+                            // optimistic removal
+                            e.currentTarget.closest('.history-item').style.display = 'none';
+                            await fetch(`/api/history/${id}`, { method: 'DELETE' });
+                        }
+                    });
+                });
+
+            } catch (err) {
+                container.innerHTML = `<p class="text-danger text-center">Failed to load history from the database.</p>`;
+            }
+        }
+
+        document.getElementById('clear-history-btn').addEventListener('click', async () => {
+            if (confirm('WARNING: Are you sure you want to completely erase ALL history records?')) {
+                await fetch('/api/history/clear', { method: 'DELETE' });
+                fetchHistory(); // refresh UI
+            }
+        });
+    </script>
+</body>
+</html>
